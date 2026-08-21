@@ -17,3 +17,14 @@ def register_user(first_name, last_name, email, password):
     db.session.commit()
 
     return user
+
+def authenticate_user(email, password):
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return None
+    if not user.is_active:
+        return None
+    if not user.check_password(password):
+        return None
+
+    return user
