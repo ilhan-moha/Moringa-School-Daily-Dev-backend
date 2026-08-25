@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import (create_access_token, get_jwt_identity, jwt_required)
 from services.auth_service import register_user, authenticate_user
 from models.user import User
+from extensions import db
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth")
 
@@ -80,7 +81,7 @@ def login():
 @jwt_required()
 def get_current_user():
     user_id = get_jwt_identity()
-    user = User.query.get(int(user_id))
+    user = db.session.get(User, int(user_id))
 
     if not user:
         return jsonify({"message": "User not found"}), 404
