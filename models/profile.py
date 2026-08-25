@@ -10,27 +10,19 @@ class Profile(db.Model):
         unique=True,
         nullable=False
     )
-
     bio = db.Column(db.Text, nullable=True)
     avatar_url = db.Column(db.String(255), nullable=True)
     github_url = db.Column(db.String(255), nullable=True)
     linkedin_url = db.Column(db.String(255), nullable=True)
     website_url = db.Column(db.String(255), nullable=True)
-    created_at = db.Column(
-        db.DateTime,
-        default=lambda: datetime.now(timezone.utc),
-        nullable=False
-    )
-    updated_at = db.Column(
-        db.DateTime,
-        default=lambda: datetime.now(timezone.utc),
-        onupdate=lambda: datetime.now(timezone.utc),
-        nullable=False
-    )
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+    
     user = db.relationship(
         "User",
         backref=db.backref("profile", uselist=False)
     )
+
     def to_dict(self):
         return {
             "id": self.id,
