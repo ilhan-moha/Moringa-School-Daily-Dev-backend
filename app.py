@@ -5,6 +5,8 @@ from models import User
 from routes.auth_route import auth_bp
 
 
+from routes.user_route import user_bp
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
@@ -14,11 +16,9 @@ def create_app():
     jwt.init_app(app)
     cors.init_app(app)
 
-    app.register_blueprint(auth_bp)
 
-    @app.get("/test")
-    def test():
-        return {"message": "correct Flask app"}
+    app.register_blueprint(user_bp)
+
     return app
 
 app = create_app()
