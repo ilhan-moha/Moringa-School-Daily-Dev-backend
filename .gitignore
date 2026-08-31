@@ -1,9 +1,13 @@
+# Environment variables
 .env
+.env.*
+!.env.example
+
+# Python virtual environment
 venv/
-.venv
+
+# Python cache
 __pycache__/
 *.py[cod]
-*.pyc
-.pytest_cache/venv/
-__pycache__/
-*.pyc
+.pytest_cache/
+
