@@ -8,6 +8,13 @@ from routes.auth_helpers import get_current_user
 report_bp = Blueprint("report", __name__, url_prefix="/api/reports")
 
 
+def staff_only():
+    user = get_current_user()
+    if user.role not in ("admin", "writer"):
+        return None, (jsonify({"error": "Forbidden"}), 403)
+    return user, None
+
+
 @report_bp.route("", methods=["POST"])
 @jwt_required()
 def file_report():
@@ -19,7 +26,6 @@ def file_report():
         return jsonify({"error": "content_id and reason are required"}), 400
 
     Content.query.get_or_404(content_id)
-
     report = Report(content_id=content_id, reporter_id=current_user.id, reason=reason)
     db.session.add(report)
     db.session.commit()
@@ -29,11 +35,14 @@ def file_report():
 @report_bp.route("", methods=["GET"])
 @jwt_required()
 def list_reports():
-    current_user = get_current_user()
-    if current_user.role not in ("admin", "writer"):
-        return jsonify({"error": "Forbidden"}), 403
+    _, error = staff_only()
+    if error:
+        return error
 
     status = request.args.get("status", "pending")
+    if status not in ("pending", "resolved", "dismissed"):
+        return jsonify({"error": "Invalid report status"}), 400
+
     reports = Report.query.filter_by(status=status).order_by(Report.created_at.desc()).all()
     return jsonify([r.to_dict() for r in reports]), 200
 
@@ -41,9 +50,9 @@ def list_reports():
 @report_bp.route("/<int:report_id>/dismiss", methods=["POST"])
 @jwt_required()
 def dismiss_report(report_id):
-    current_user = get_current_user()
-    if current_user.role not in ("admin", "writer"):
-        return jsonify({"error": "Forbidden"}), 403
+    current_user, error = staff_only()
+    if error:
+        return error
 
     report = Report.query.get_or_404(report_id)
     report.status = "dismissed"
@@ -55,17 +64,16 @@ def dismiss_report(report_id):
 @report_bp.route("/<int:report_id>/resolve", methods=["POST"])
 @jwt_required()
 def resolve_report(report_id):
-    current_user = get_current_user()
-    if current_user.role not in ("admin", "writer"):
-        return jsonify({"error": "Forbidden"}), 403
+    current_user, error = staff_only()
+    if error:
+        return error
 
     report = Report.query.get_or_404(report_id)
     report.status = "resolved"
     report.resolved_by_id = current_user.id
-
-    content = Content.query.get(report.content_id)
-    if content:
-        db.session.delete(content)
-
     db.session.commit()
-    return jsonify(report.to_dict()), 200
+
+    return jsonify({
+        "message": "Report resolved successfully",
+        "report": report.to_dict(),
+    }), 200
