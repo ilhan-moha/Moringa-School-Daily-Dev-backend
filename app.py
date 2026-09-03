@@ -31,29 +31,11 @@ def create_app():
 
     cors.init_app(
         app,
-        resources={
-            r"/api/*": {
-                "origins": [
-                "https://daily-dev-lime.vercel.app/"
-                ],
-                "methods": [
-                    "GET",
-                    "POST",
-                    "PUT",
-                    "PATCH",
-                    "DELETE",
-                    "OPTIONS"
-                ],
-                "allow_headers": [
-                    "Content-Type",
-                    "Authorization"
-                ],
-                "supports_credentials": True
-            }
-        }
+        origins=["https://daily-dev-lime.vercel.app", "http://localhost:5173"],
+        supports_credentials=True,
+        allow_headers=["Content-Type", "Authorization"],
+        methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
     )
-
-
 
     @app.route("/")
     def home():
