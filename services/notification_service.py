@@ -34,11 +34,12 @@ def mark_notification_as_read(notification, user_id):
 
     return notification
 
-def mark_all_notifications_as_read(user_id):
-    notifications = Notification.query.filter_by(user_id=user_id, is_read=False).all()
-    for notification in notifications:
-        notification.is_read = True
+def mark_notification_as_read(notification_id, user_id):
+    notification = Notification.query.filter_by(id=notification_id, user_id=user_id).first()
+    if not notification:
+        return None
 
+    notification.is_read = True
     db.session.commit()
 
-    return notifications
+    return notification
