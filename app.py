@@ -31,7 +31,7 @@ def create_app():
 
     cors.init_app(
         app,
-        origins=["https://daily-dev-lime.vercel.app", "http://localhost:5173"],
+        origins=["https://daily-dev-lime.vercel.app","https://daily-dev-7rgw-nzwxxxv5v-ilhan4.vercel.app", "http://localhost:5173"],
         supports_credentials=True,
         allow_headers=["Content-Type", "Authorization"],
         methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
