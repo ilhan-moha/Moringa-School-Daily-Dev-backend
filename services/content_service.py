@@ -2,8 +2,6 @@ from extensions import db
 from models.content import Content
 from models.reaction import Reaction
 from models.comment import Comment
-from services.notification_service import create_content_notifications
-
 
 
 def create_content(data, current_user):
@@ -19,18 +17,6 @@ def create_content(data, current_user):
     )
     db.session.add(content)
     db.session.commit()
-
-    if content.status == "approved":
-        create_content_notifications(content)
-
-    return content
-
-def approve_content(content):
-    content.status = "approved"
-    db.session.commit()
-
-    create_content_notifications(content)
-
     return content
 
 
